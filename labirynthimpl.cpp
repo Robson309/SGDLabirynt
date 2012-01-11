@@ -10,8 +10,8 @@
 
 using namespace std;
 
-LabirynthImpl::LabirynthImpl()
-{
+LabirynthImpl::LabirynthImpl(){
+
 	btnFrame_ = new LabirynthTile( "data/frame.bmp" );
 	btnFrame_->move( 8, 598 );
 	btnWall_ = new LabirynthTile( "data/wall.bmp", 1000 ); //koszt przejœcia
@@ -23,8 +23,49 @@ LabirynthImpl::LabirynthImpl()
 	btnSearch_ = new Sprite( "data/search.bmp" );
 	btnSearch_->move( 100, 600 );
 	btnCurrent_ = btnWall_;
-	start_ = NULL;
-	finish_ = NULL;
+
+	
+	int gridx = 1;
+	int gridy = 1;
+	for(int i = 1; i<30; ++i){
+		grid_[gridy][i] = btnCurrent_->clone();
+		grid_[gridy][i]->move( 20 * i, 20 * gridy );
+	}
+
+	gridx = 1;
+	for(int j = 2; j<28; ++j){
+		grid_[j][gridx] = btnCurrent_->clone();
+		grid_[j][gridx]->move( 20 * gridx, 20 * j );
+	}
+
+	gridy = 28;
+	for(int i = 1; i<30; ++i){
+		grid_[gridy][i] = btnCurrent_->clone();
+		grid_[gridy][i]->move( 20 * i, 20 * gridy );
+	}
+
+	gridx = 29;
+	for(int j = 2; j<28; ++j){
+		grid_[j][gridx] = btnCurrent_->clone();
+		grid_[j][gridx]->move( 20 * gridx, 20 * j );
+	}
+	
+	btnCurrent_= btnStart_;
+	gridx = 2;
+	gridy = 2;
+	grid_[gridy][gridx] = btnCurrent_->clone();
+	grid_[gridy][gridx]->move( 20 * gridx, 20 * gridy );
+	start_ = grid_[gridy][gridx];
+
+	btnCurrent_= btnFinish_;
+	gridx = 28;
+	gridy = 27;
+	grid_[gridy][gridx] = btnCurrent_->clone();
+	grid_[gridy][gridx]->move( 20 * gridx, 20 * gridy );
+	finish_ = grid_[gridy][gridx];
+
+	//start_ = NULL;
+	//finish_ = NULL;
 	plotPath_ = false;
 }
 
@@ -39,7 +80,7 @@ LabirynthImpl::~LabirynthImpl(){
 
 
 void LabirynthImpl::processLMB(){ //klikamy na lewy przycisk
-	int gridx = Display().mouseX() / 20; //miejsce na ekranie
+	int gridx = Display().mouseX() / 20; //miejsce na ekranie wg wskazañ myszki
 	int gridy = Display().mouseY() / 20;
 
 	if ( !buttonPressed() ){ //je¿eli nie klikamy na button
@@ -156,9 +197,9 @@ void LabirynthImpl::buildGraph(){
 		int x = start % grid_.width(), y = start / grid_.width(); //indeks wêz³a x=100%30=10; y=100/30=3
 		Point neighbours[] = 
 		{
-			Point( x, y - 1 ),
+									Point( x, y - 1 ),
 			Point( x - 1, y ),								Point( x + 1, y ),
-			Point( x, y + 1 ),
+									Point( x, y + 1 ),
 		};
 		for ( int numNeighbour = 0; numNeighbour!= 4; ++numNeighbour){
 			Point& p = neighbours[numNeighbour];
@@ -190,8 +231,8 @@ vector<Point> LabirynthImpl::findPath(const Point& p1,const Point& p2, int* outC
 		cout << "(" << path[i].x << "," << path[i].y << ")" << endl;
 	}
 
-	if ( outCost )
-	{
+	if ( outCost ){
+
 		*outCost = (int)search.CostToTarget();
 	}
 	return path;
